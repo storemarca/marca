@@ -289,9 +289,9 @@ class CartService extends ChangeNotifier {
       return 0.0;
     }
 
-    // Calculate total weight (in a real app, you would get this from the product)
+    // Calculate total weight
     final double totalWeight = _items.fold(
-        0, (sum, item) => sum + (item.product.weight ?? 0) * item.quantity);
+        0, (sum, item) => sum + (item.product.weight * item.quantity));
 
     // Get product IDs for checking free shipping eligibility
     final List<String> productIds =

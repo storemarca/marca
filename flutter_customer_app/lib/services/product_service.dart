@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'api_service.dart';
 import '../models/product.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models;
 
 class ProductService extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   
   List<Product> _products = [];
-  List<Category> _categories = [];
+  List<app_models.Category> _categories = [];
   Product? _selectedProduct;
   bool _isLoading = false;
   String? _error;
@@ -16,7 +16,7 @@ class ProductService extends ChangeNotifier {
   
   // Getters
   List<Product> get products => _products;
-  List<Category> get categories => _categories;
+  List<app_models.Category> get categories => _categories;
   Product? get selectedProduct => _selectedProduct;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -179,7 +179,7 @@ class ProductService extends ChangeNotifier {
       if (response['success'] == true) {
         final List<dynamic> categoriesJson = response['data'] ?? [];
         _categories = categoriesJson
-            .map((json) => Category.fromJson(json))
+            .map((json) => app_models.Category.fromJson(json))
             .toList();
         
         notifyListeners();

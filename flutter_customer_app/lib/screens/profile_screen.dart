@@ -28,11 +28,11 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Theme.of(context).primaryColor,
-                    child: user?.profileImage != null
+                    child: user?.avatar != null
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(50),
                             child: Image.network(
-                              user!.profileImage!,
+                              user!.avatar!,
                               width: 100,
                               height: 100,
                               fit: BoxFit.cover,

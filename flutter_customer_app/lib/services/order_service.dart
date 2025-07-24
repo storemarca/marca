@@ -33,8 +33,8 @@ class OrderService extends ChangeNotifier {
       final orderItems = items.map((item) => {
         'product_id': item.product.id,
         'quantity': item.quantity,
-        'price': item.product.price,
-        'subtotal': item.product.price * item.quantity,
+        'price': item.product.getCurrentPrice()?.price ?? 0.0,
+        'subtotal': (item.product.getCurrentPrice()?.price ?? 0.0) * item.quantity,
       }).toList();
 
       final payload = {

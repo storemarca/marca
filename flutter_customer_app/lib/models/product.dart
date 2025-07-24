@@ -231,4 +231,12 @@ class Product {
   bool isInStock() {
     return getTotalStock() > 0;
   }
+  
+  // Get thumbnail URL (first image or default)
+  String get thumbnailUrl {
+    if (images.isNotEmpty) {
+      return images.first;
+    }
+    return 'https://via.placeholder.com/150?text=No+Image';
+  }
 }

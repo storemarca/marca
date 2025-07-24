@@ -363,8 +363,6 @@ class _AffiliateLinksScreenState extends State<AffiliateLinksScreen> {
 
   void _showCreateLinkDialog(BuildContext context) {
     final _titleController = TextEditingController();
-    String? _selectedProductId;
-    String? _selectedProductName;
 
     showDialog(
       context: context,
@@ -396,8 +394,6 @@ class _AffiliateLinksScreenState extends State<AffiliateLinksScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        _selectedProductId = null;
-                        _selectedProductName = null;
                         Navigator.pop(context);
                         _createLink(
                           context,

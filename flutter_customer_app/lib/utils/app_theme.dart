@@ -34,11 +34,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
       ),
     ),
-    cardTheme: const CardTheme(
-      color: cardColor,
-      elevation: 2,
-      margin: EdgeInsets.all(8),
-    ),
+    cardColor: cardColor,
     buttonTheme: const ButtonThemeData(
       buttonColor: primaryColor,
       textTheme: ButtonTextTheme.primary,
