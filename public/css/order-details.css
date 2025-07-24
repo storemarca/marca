@@ -1,0 +1,675 @@
+/* تنسيقات صفحة تفاصيل الطلبات - v2.0 */
+
+/* استيراد المتغيرات من الملف الرئيسي */
+:root {
+  /* الألوان الرئيسية */
+  --primary: #4361ee;
+  --primary-light: #4895ef;
+  --primary-dark: #3f37c9;
+  --secondary: #4cc9f0;
+  --secondary-light: #72efdd;
+  --secondary-dark: #4361ee;
+  
+  /* ألوان الحالات */
+  --success: #06d6a0;
+  --warning: #ffd166;
+  --danger: #ef476f;
+  --info: #118ab2;
+  
+  /* ألوان محايدة */
+  --white: #ffffff;
+  --light: #f8f9fa;
+  --light-gray: #e9ecef;
+  --gray: #6c757d;
+  --dark-gray: #495057;
+  --dark: #212529;
+  
+  /* متغيرات التخطيط */
+  --border-radius: 10px;
+  --card-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+  --transition-speed: 0.3s;
+}
+
+/* ===== تنسيقات الخلفيات والألوان ===== */
+/* خلفيات التدرج */
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-primary-light {
+  --tw-gradient-from: var(--primary-light);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(72, 149, 239, 0));
+}
+
+.to-primary {
+  --tw-gradient-to: var(--primary);
+}
+
+.from-white {
+  --tw-gradient-from: var(--white);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 255, 255, 0));
+}
+
+.to-light {
+  --tw-gradient-to: var(--light);
+}
+
+.bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+/* ===== تنسيقات الشريط العلوي للطلب ===== */
+.order-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+}
+
+.order-header .btn {
+  transition: all 0.3s ease;
+}
+
+.order-header .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.order-number-badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  color: var(--white);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+/* ===== تنسيقات بطاقات الإحصائيات ===== */
+.stat-card {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  border-right: 4px solid transparent;
+}
+
+.stat-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.stat-card:hover .icon-wrapper {
+  transform: scale(1.1) rotate(10deg);
+}
+
+.stat-card.blue {
+  border-right-color: var(--primary);
+}
+
+.stat-card.blue .icon-wrapper {
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+}
+
+.stat-card.green {
+  border-right-color: var(--success);
+}
+
+.stat-card.green .icon-wrapper {
+  background-color: rgba(6, 214, 160, 0.1);
+  color: var(--success);
+}
+
+.stat-card.purple {
+  border-right-color: #7c3aed;
+}
+
+.stat-card.purple .icon-wrapper {
+  background-color: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+.stat-card.yellow {
+  border-right-color: var(--warning);
+}
+
+.stat-card.yellow .icon-wrapper {
+  background-color: rgba(255, 209, 102, 0.1);
+  color: var(--warning);
+}
+
+/* ===== تنسيقات بطاقات المعلومات ===== */
+.info-card {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-speed) ease;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-card:hover {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+.info-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+}
+
+.info-card-header h3 i {
+  margin-left: 0.75rem;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.info-card-body {
+  padding: 1.5rem;
+  background: linear-gradient(to bottom right, var(--white), rgba(248, 249, 250, 0.5));
+}
+
+/* ===== تنسيقات حقول البيانات ===== */
+.data-field {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-speed) ease;
+  margin-bottom: 1rem;
+}
+
+.data-field:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border-color: rgba(67, 97, 238, 0.2);
+}
+
+.data-field-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.data-field-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+  font-size: 1.25rem;
+}
+
+.data-field-icon.blue {
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+}
+
+.data-field-icon.teal {
+  background-color: rgba(6, 214, 160, 0.1);
+  color: var(--success);
+}
+
+.data-field-icon.purple {
+  background-color: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+.data-field-icon.indigo {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.data-field-label {
+  font-size: 0.875rem;
+  color: var(--gray);
+  font-weight: 500;
+}
+
+.data-field-value {
+  background-color: rgba(248, 249, 250, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--dark);
+  text-align: center;
+  transition: all var(--transition-speed) ease;
+}
+
+.data-field:hover .data-field-value {
+  background-color: rgba(67, 97, 238, 0.05);
+  border-color: rgba(67, 97, 238, 0.1);
+}
+
+/* ===== تنسيقات الجدول ===== */
+.order-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.order-table th {
+  background: linear-gradient(to right, rgba(248, 249, 250, 0.7), rgba(67, 97, 238, 0.05));
+  color: var(--dark-gray);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.order-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+}
+
+.order-table tbody tr {
+  transition: all var(--transition-speed) ease;
+}
+
+.order-table tbody tr:hover {
+  background-color: rgba(67, 97, 238, 0.02);
+}
+
+.order-table tfoot {
+  background: linear-gradient(to right, rgba(248, 249, 250, 0.7), rgba(67, 97, 238, 0.05));
+}
+
+.order-table tfoot td {
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+}
+
+.order-table .total-row {
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.1), rgba(76, 201, 240, 0.1));
+}
+
+.order-table .total-row td {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.order-table .total-value {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+/* ===== تنسيقات الشارات والحالات ===== */
+.status-badge {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+}
+
+.status-pending {
+  background-color: rgba(76, 201, 240, 0.1);
+  color: var(--info);
+}
+
+.status-pending .dot {
+  background-color: var(--info);
+}
+
+.status-processing {
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+}
+
+.status-processing .dot {
+  background-color: var(--primary);
+}
+
+.status-shipped {
+  background-color: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+.status-shipped .dot {
+  background-color: #7c3aed;
+}
+
+.status-delivered {
+  background-color: rgba(6, 214, 160, 0.1);
+  color: var(--success);
+}
+
+.status-delivered .dot {
+  background-color: var(--success);
+}
+
+.status-cancelled {
+  background-color: rgba(239, 71, 111, 0.1);
+  color: var(--danger);
+}
+
+.status-cancelled .dot {
+  background-color: var(--danger);
+}
+
+.status-paid {
+  background-color: rgba(6, 214, 160, 0.1);
+  color: var(--success);
+}
+
+.status-paid .dot {
+  background-color: var(--success);
+}
+
+.status-pending-payment {
+  background-color: rgba(255, 209, 102, 0.1);
+  color: var(--warning);
+}
+
+.status-pending-payment .dot {
+  background-color: var(--warning);
+}
+
+.status-failed {
+  background-color: rgba(239, 71, 111, 0.1);
+  color: var(--danger);
+}
+
+.status-failed .dot {
+  background-color: var(--danger);
+}
+
+/* ===== تنسيقات أزرار النسخ ===== */
+.copy-btn {
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.copy-btn:hover {
+  background-color: rgba(67, 97, 238, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-btn.pulse {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+/* ===== تنسيقات التلميحات ===== */
+[data-tooltip] {
+  position: relative;
+  overflow: visible !important;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  right: 50%;
+  transform: translateX(50%);
+  margin-bottom: 8px;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--dark);
+  color: var(--white);
+  font-size: 0.75rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in-out forwards;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 50%;
+  transform: translateX(50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--dark) transparent transparent transparent;
+  margin-bottom: -2px;
+  z-index: 1001;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(50%) translateY(0);
+  }
+}
+
+/* ===== تنسيقات الإشعارات ===== */
+#notification-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  direction: rtl;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  border-right: 3px solid var(--primary);
+  min-width: 300px;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+  font-size: 1.25rem;
+}
+
+.notification .icon.success {
+  background-color: rgba(6, 214, 160, 0.1);
+  color: var(--success);
+}
+
+.notification .icon.error {
+  background-color: rgba(239, 71, 111, 0.1);
+  color: var(--danger);
+}
+
+.notification .content {
+  flex: 1;
+}
+
+.notification .title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--dark);
+}
+
+.notification .message {
+  font-size: 0.875rem;
+  color: var(--gray);
+}
+
+.notification .close {
+  color: var(--gray);
+  cursor: pointer;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  margin-right: 0.5rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.notification .close:hover {
+  color: var(--danger);
+}
+
+/* ===== تنسيقات النماذج ===== */
+.form-section {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.form-section-header {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.form-section-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+    display: flex;
+    align-items: center;
+}
+
+.form-section-header h3 i {
+  margin-left: 0.75rem;
+  color: var(--primary);
+}
+
+.form-section-body {
+  padding: 1.5rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+}
+
+/* ===== تنسيقات الاستجابة ===== */
+@media (max-width: 991.98px) {
+  .order-header {
+    padding: 1.25rem;
+  }
+  
+  .order-header .d-flex {
+    flex-direction: column;
+  }
+  
+  .order-header .d-flex > div {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .data-field {
+    margin-bottom: 1rem;
+}
+}
+
+@media (max-width: 767.98px) {
+  .info-card-header,
+  .info-card-body,
+  .form-section-header,
+  .form-section-body {
+    padding: 1.25rem;
+  }
+  
+  .order-table th,
+  .order-table td {
+    padding: 0.75rem 1rem;
+  }
+  
+  .data-field {
+    padding: 1rem;
+  }
+  
+  .data-field-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    }
+} 
