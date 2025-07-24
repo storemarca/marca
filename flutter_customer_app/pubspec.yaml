@@ -39,7 +39,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/translations/
-    - .env
+    - env.txt
   
   fonts:
     - family: Cairo

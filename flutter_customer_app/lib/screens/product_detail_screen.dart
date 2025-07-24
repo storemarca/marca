@@ -102,9 +102,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               onPressed: () {
                 SocialShare.shareProduct(
                   name: product.name,
-                  description: product.description ?? 'Check out this amazing product!',
+                  description: product.description,
                   url: 'https://yourstore.com/products/${product.slug}',
-                  imageUrl: product.images.isNotEmpty ? product.images[0] : null,
+                  imageUrl: product.images.isEmpty ? null : product.images[0],
                 );
                 ToastHelper.showSuccess('تمت مشاركة المنتج');
               },
