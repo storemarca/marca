@@ -156,7 +156,7 @@ class ReportController extends Controller
         $orders = $query->orderBy('created_at', 'desc')->paginate(20);
         
         // إحصائيات
-        $totalSales = Order::where('status', '!=', 'cancelled')->sum('total');
+        $totalSales = Order::where('status', '!=', 'cancelled')->sum('total_amount');
         $totalOrders = Order::where('status', '!=', 'cancelled')->count();
         $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
         
@@ -184,7 +184,7 @@ class ReportController extends Controller
         
         $salesByMonth = Order::where('status', '!=', 'cancelled')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(total) as total')
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(total_amount) as total')
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class TranslationServiceProvider extends ServiceProvider
 {
@@ -65,13 +66,26 @@ class TranslationServiceProvider extends ServiceProvider
             $jsonPath = resource_path("lang/{$locale}.json");
             
             if (File::exists($jsonPath)) {
-                $translations = json_decode(File::get($jsonPath), true);
-                if (is_array($translations)) {
-                    Cache::put($cacheKey, $translations, now()->addDay()); // Store for a day
+                try {
+                    $content = File::get($jsonPath);
+                    $translations = json_decode($content, true);
                     
-                    // Register the translations with the translator
-                    Lang::addJsonPath(resource_path('lang'));
+                    if (is_array($translations)) {
+                        Cache::put($cacheKey, $translations, now()->addMinutes(config('translations.cache_lifetime', 1440)));
+                        
+                        // Register the translations with the translator
+                        Lang::addJsonPath(resource_path('lang'));
+                        
+                        // Log success
+                        Log::debug("Loaded JSON translations for {$locale}: " . count($translations) . " entries");
+                    } else {
+                        Log::error("Failed to decode JSON translations for {$locale}. Content: " . substr($content, 0, 100) . "...");
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Error loading JSON translations for {$locale}: " . $e->getMessage());
                 }
+            } else {
+                Log::warning("JSON translation file does not exist: {$jsonPath}");
             }
             
             // Also check for fallback locale if different from current
@@ -79,9 +93,14 @@ class TranslationServiceProvider extends ServiceProvider
             if ($locale !== $fallbackLocale) {
                 $fallbackPath = resource_path("lang/{$fallbackLocale}.json");
                 if (File::exists($fallbackPath)) {
-                    $fallbackTranslations = json_decode(File::get($fallbackPath), true);
-                    if (is_array($fallbackTranslations)) {
-                        Cache::put('translations_json_' . $fallbackLocale, $fallbackTranslations, now()->addDay());
+                    try {
+                        $fallbackTranslations = json_decode(File::get($fallbackPath), true);
+                        if (is_array($fallbackTranslations)) {
+                            Cache::put('translations_json_' . $fallbackLocale, $fallbackTranslations, now()->addMinutes(config('translations.cache_lifetime', 1440)));
+                            Log::debug("Loaded fallback JSON translations for {$fallbackLocale}: " . count($fallbackTranslations) . " entries");
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("Error loading fallback JSON translations for {$fallbackLocale}: " . $e->getMessage());
                     }
                 }
             }
@@ -106,12 +125,20 @@ class TranslationServiceProvider extends ServiceProvider
                 
                 foreach (File::files($phpPath) as $file) {
                     $filename = pathinfo($file, PATHINFO_FILENAME);
-                    $translations[$filename] = require $file->getPathname();
+                    try {
+                        $fileTranslations = require $file->getPathname();
+                        $translations[$filename] = $fileTranslations;
+                        Log::debug("Loaded PHP translations for {$locale}.{$filename}: " . count($fileTranslations) . " entries");
+                    } catch (\Exception $e) {
+                        Log::error("Error loading PHP translations for {$locale}.{$filename}: " . $e->getMessage());
+                    }
                 }
                 
                 if (!empty($translations)) {
-                    Cache::put($cacheKey, $translations, now()->addDay()); // Store for a day
+                    Cache::put($cacheKey, $translations, now()->addMinutes(config('translations.cache_lifetime', 1440)));
                 }
+            } else {
+                Log::warning("PHP language directory does not exist: {$phpPath}");
             }
             
             // Also check for fallback locale if different from current
@@ -123,11 +150,17 @@ class TranslationServiceProvider extends ServiceProvider
                     
                     foreach (File::files($fallbackPath) as $file) {
                         $filename = pathinfo($file, PATHINFO_FILENAME);
-                        $fallbackTranslations[$filename] = require $file->getPathname();
+                        try {
+                            $fileTranslations = require $file->getPathname();
+                            $fallbackTranslations[$filename] = $fileTranslations;
+                            Log::debug("Loaded fallback PHP translations for {$fallbackLocale}.{$filename}: " . count($fileTranslations) . " entries");
+                        } catch (\Exception $e) {
+                            Log::error("Error loading fallback PHP translations for {$fallbackLocale}.{$filename}: " . $e->getMessage());
+                        }
                     }
                     
                     if (!empty($fallbackTranslations)) {
-                        Cache::put('translations_php_' . $fallbackLocale, $fallbackTranslations, now()->addDay());
+                        Cache::put('translations_php_' . $fallbackLocale, $fallbackTranslations, now()->addMinutes(config('translations.cache_lifetime', 1440)));
                     }
                 }
             }
@@ -139,11 +172,12 @@ class TranslationServiceProvider extends ServiceProvider
      */
     protected function clearTranslationCache()
     {
-        $locales = ['en', 'ar']; // Add all supported locales
+        $locales = config('translations.locales', ['en', 'ar']);
         
         foreach ($locales as $locale) {
             Cache::forget('translations_json_' . $locale);
             Cache::forget('translations_php_' . $locale);
+            Log::debug("Cleared translation cache for {$locale}");
         }
         
         // Also clear the Laravel translation cache

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'الإعدادات العامة')
-@section('page-title', 'الإعدادات العامة')
+@section('title', safe_trans('admin.general_settings'))
+@section('page-title', safe_trans('admin.general_settings'))
 
 @section('content')
     <div class="row">
@@ -12,7 +12,7 @@
         <div class="col-lg-9">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">الإعدادات العامة للموقع</h5>
+                    <h5 class="mb-0">{{ safe_trans('admin.general_settings') }}</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.settings.general.update') }}" method="POST" enctype="multipart/form-data">
@@ -21,10 +21,10 @@
                         
                         <!-- معلومات الموقع الأساسية -->
                         <div class="mb-4">
-                            <h6 class="fw-bold mb-3">معلومات الموقع الأساسية</h6>
+                            <h6 class="fw-bold mb-3">{{ safe_trans('admin.basic_site_info') }}</h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="site_name" class="form-label">اسم الموقع</label>
+                                    <label for="site_name" class="form-label">{{ safe_trans('admin.site_name') }}</label>
                                     <input type="text" class="form-control @error('site_name') is-invalid @enderror" id="site_name" name="site_name" value="{{ old('site_name', $settings['site_name'] ?? config('app.name')) }}">
                                     @error('site_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -32,7 +32,7 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label for="site_email" class="form-label">البريد الإلكتروني للموقع</label>
+                                    <label for="site_email" class="form-label">{{ safe_trans('admin.site_email') }}</label>
                                     <input type="email" class="form-control @error('site_email') is-invalid @enderror" id="site_email" name="site_email" value="{{ old('site_email', $settings['site_email'] ?? '') }}">
                                     @error('site_email')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -40,7 +40,7 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label for="site_phone" class="form-label">رقم الهاتف</label>
+                                    <label for="site_phone" class="form-label">{{ safe_trans('admin.site_phone') }}</label>
                                     <input type="text" class="form-control @error('site_phone') is-invalid @enderror" id="site_phone" name="site_phone" value="{{ old('site_phone', $settings['site_phone'] ?? '') }}">
                                     @error('site_phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -48,10 +48,10 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label for="default_language" class="form-label">اللغة الافتراضية</label>
+                                    <label for="default_language" class="form-label">{{ safe_trans('admin.default_language') }}</label>
                                     <select class="form-select @error('default_language') is-invalid @enderror" id="default_language" name="default_language">
-                                        <option value="ar" {{ old('default_language', $settings['default_language'] ?? 'ar') == 'ar' ? 'selected' : '' }}>العربية</option>
-                                        <option value="en" {{ old('default_language', $settings['default_language'] ?? 'ar') == 'en' ? 'selected' : '' }}>English</option>
+                                        <option value="ar" {{ old('default_language', $settings['default_language'] ?? 'ar') == 'ar' ? 'selected' : '' }}>{{ safe_trans('admin.arabic') }}</option>
+                                        <option value="en" {{ old('default_language', $settings['default_language'] ?? 'ar') == 'en' ? 'selected' : '' }}>{{ safe_trans('admin.english') }}</option>
                                     </select>
                                     @error('default_language')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -59,7 +59,7 @@
                                 </div>
                                 
                                 <div class="col-12">
-                                    <label for="site_description" class="form-label">وصف الموقع</label>
+                                    <label for="site_description" class="form-label">{{ safe_trans('admin.site_description') }}</label>
                                     <textarea class="form-control @error('site_description') is-invalid @enderror" id="site_description" name="site_description" rows="3">{{ old('site_description', $settings['site_description'] ?? '') }}</textarea>
                                     @error('site_description')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -67,7 +67,7 @@
                                 </div>
                                 
                                 <div class="col-12">
-                                    <label for="site_address" class="form-label">عنوان الشركة</label>
+                                    <label for="site_address" class="form-label">{{ safe_trans('admin.site_address') }}</label>
                                     <textarea class="form-control @error('site_address') is-invalid @enderror" id="site_address" name="site_address" rows="2">{{ old('site_address', $settings['site_address'] ?? '') }}</textarea>
                                     @error('site_address')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -80,19 +80,19 @@
                         
                         <!-- إعدادات العملة -->
                         <div class="mb-4">
-                            <h6 class="fw-bold mb-3">إعدادات العملة</h6>
+                            <h6 class="fw-bold mb-3">{{ safe_trans('admin.currency_settings') }}</h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="currency" class="form-label">العملة</label>
-                                    <input type="text" class="form-control @error('currency') is-invalid @enderror" id="currency" name="currency" value="{{ old('currency', $settings['currency'] ?? 'SAR') }}" placeholder="مثال: SAR, USD">
+                                    <label for="currency" class="form-label">{{ safe_trans('admin.currency') }}</label>
+                                    <input type="text" class="form-control @error('currency') is-invalid @enderror" id="currency" name="currency" value="{{ old('currency', $settings['currency'] ?? 'SAR') }}" placeholder="{{ safe_trans('admin.currency_placeholder') }}">
                                     @error('currency')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label for="currency_symbol" class="form-label">رمز العملة</label>
-                                    <input type="text" class="form-control @error('currency_symbol') is-invalid @enderror" id="currency_symbol" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol'] ?? 'ر.س') }}" placeholder="مثال: ر.س, $">
+                                    <label for="currency_symbol" class="form-label">{{ safe_trans('admin.currency_symbol') }}</label>
+                                    <input type="text" class="form-control @error('currency_symbol') is-invalid @enderror" id="currency_symbol" name="currency_symbol" value="{{ old('currency_symbol', $settings['currency_symbol'] ?? 'ر.س') }}" placeholder="{{ safe_trans('admin.currency_symbol_placeholder') }}">
                                     @error('currency_symbol')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -169,7 +169,7 @@
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> حفظ الإعدادات
+                                <i class="fas fa-save me-1"></i> {{ safe_trans('admin.save_settings') }}
                             </button>
                         </div>
                     </form>

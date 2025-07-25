@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\RedirectResponse;
 
 class LanguageController extends Controller
 {
@@ -14,7 +15,7 @@ class LanguageController extends Controller
      * Change the current language
      *
      * @param  string  $locale
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function switchLang($locale)
     {

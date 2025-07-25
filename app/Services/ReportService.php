@@ -469,7 +469,7 @@ class ReportService
     {
         return Order::whereBetween('created_at', [$startDate, $endDate])
             ->where('status', '!=', Order::STATUS_CANCELLED)
-            ->sum('total') ?? 0;
+            ->sum('total_amount') ?? 0;
     }
     
     /**

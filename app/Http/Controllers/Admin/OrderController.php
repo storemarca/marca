@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\Shipment;
 use App\Models\ShippingCompany;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Notifications\OrderStatusChanged;
 
 class OrderController extends Controller

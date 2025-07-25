@@ -144,6 +144,13 @@ Route::get('reports/stock-movements', [ReportController::class, 'stockMovements'
         Route::post('/general', [SettingController::class, 'saveGeneral'])->name('general.save');
         Route::put('/general', [SettingController::class, 'saveGeneral'])->name('general.update');
         
+        // إعدادات اللغة
+        Route::get('/language', [App\Http\Controllers\Admin\LanguageController::class, 'index'])->name('language');
+        Route::put('/language', [App\Http\Controllers\Admin\LanguageController::class, 'update'])->name('language.update');
+        Route::get('/language/translations', [App\Http\Controllers\Admin\LanguageController::class, 'getTranslations'])->name('language.translations.get');
+        Route::post('/language/translations', [App\Http\Controllers\Admin\LanguageController::class, 'saveTranslations'])->name('language.translations.save');
+        Route::post('/language/clear-cache', [App\Http\Controllers\Admin\LanguageController::class, 'clearCache'])->name('language.clear-cache');
+        
         // إعدادات الصفحة الرئيسية
         Route::get('/homepage', [SettingController::class, 'homepage'])->name('homepage');
         Route::post('/homepage', [SettingController::class, 'saveHomepage'])->name('homepage.save');

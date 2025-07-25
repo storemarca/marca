@@ -44,8 +44,16 @@ if (!function_exists('safe_trans')) {
         $jsonTranslation = trans($key, $replace, $locale);
         
         // If the key was returned unchanged, it means the translation wasn't found in JSON
-        // Try to get it from the PHP files
+        // Try to load directly from the JSON file
         if ($jsonTranslation === $key) {
+            $jsonPath = resource_path("lang/{$locale}.json");
+            if (file_exists($jsonPath)) {
+                $translations = json_decode(file_get_contents($jsonPath), true);
+                if (isset($translations[$key])) {
+                    return strtr($translations[$key], $replace);
+                }
+            }
+            
             // Try to get the translation from PHP files
             $phpTranslation = __($key, $replace, $locale);
             
@@ -54,6 +62,16 @@ if (!function_exists('safe_trans')) {
                 $fallbackTranslation = __($key, $replace, config('app.fallback_locale'));
                 if ($fallbackTranslation !== $key) {
                     return $fallbackTranslation;
+                }
+                
+                // Try fallback locale JSON file
+                $fallbackLocale = config('app.fallback_locale');
+                $fallbackJsonPath = resource_path("lang/{$fallbackLocale}.json");
+                if (file_exists($fallbackJsonPath)) {
+                    $fallbackTranslations = json_decode(file_get_contents($fallbackJsonPath), true);
+                    if (isset($fallbackTranslations[$key])) {
+                        return strtr($fallbackTranslations[$key], $replace);
+                    }
                 }
             } else if ($phpTranslation !== $key) {
                 return $phpTranslation;
