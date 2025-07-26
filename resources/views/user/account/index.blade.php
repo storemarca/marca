@@ -95,7 +95,7 @@
                                     </div>
                                     <div class="mr-4">
                                         <h3 class="font-semibold text-lg">طلباتي</h3>
-                                        <p class="text-gray-600">{{ $ordersCount }} طلب</p>
+                                        <p class="text-gray-600">{{ $ordersCount ?? 0 }} طلب</p>
                                     </div>
                                 </div>
                                 <div class="mt-4">

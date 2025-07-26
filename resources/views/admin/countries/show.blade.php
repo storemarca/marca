@@ -104,7 +104,7 @@
                                 <div class="mb-3">
                                     <i class="fas fa-shopping-cart fa-2x text-info"></i>
                                 </div>
-                                <h3 class="mb-1">{{ $ordersCount }}</h3>
+                                <h3 class="mb-1">{{ $ordersCount ?? 0 }}</h3>
                                 <div class="text-muted">{{ __('orders_count') }}</div>
                             </div>
                         </div>
