@@ -19,8 +19,12 @@ class AccountController extends Controller
     {
         $user = auth()->user();
         
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
         // إحصائيات للمستخدم
-        $ordersCount = Order::where('customer_id', $user->id)->count();
+        $ordersCount = Order::where('customer_id', $user->id)->count() ?? 0;
         $addressesCount = Address::where('customer_id', $user->id)->count();
         
         // آخر الطلبات
