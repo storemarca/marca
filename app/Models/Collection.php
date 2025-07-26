@@ -98,6 +98,6 @@ class Collection extends Model
      */
     public function order()
     {
-        return $this->shipment->order;
+        return $this->hasOneThrough(Order::class, Shipment::class, 'id', 'id', 'shipment_id', 'order_id');
     }
 }

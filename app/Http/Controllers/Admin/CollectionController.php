@@ -15,7 +15,7 @@ class CollectionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Collection::with(['order', 'order.customer']);
+        $query = Collection::with(['shipment.order.customer', 'collector']);
 
         // تطبيق الفلاتر
         if ($request->filled('status')) {
@@ -50,7 +50,9 @@ class CollectionController extends Controller
 
         $orders = collect();
         if ($collections->isNotEmpty()) {
-            $orders = $collections->pluck('order_id')->unique();
+            $orders = $collections->map(function($collection) {
+                return $collection->shipment->order_id ?? null;
+            })->filter()->unique();
         }
 
         return view('admin.collections.index', compact(
@@ -68,10 +70,14 @@ class CollectionController extends Controller
      */
     public function create()
     {
+        // Get orders that have COD shipments but no collections yet
         $orders = Order::where('payment_method', 'cash_on_delivery')
             ->where('status', 'delivered')
-            ->whereDoesntHave('collection')
-            ->with('customer')
+            ->whereHas('shipments', function($query) {
+                $query->where('is_cod', true)
+                      ->whereDoesntHave('collection');
+            })
+            ->with('customer', 'shipments')
             ->get();
 
         return view('admin.collections.create', compact('orders'));
@@ -83,18 +89,23 @@ class CollectionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'shipment_id' => 'required|exists:shipments,id',
             'amount' => 'required|numeric|min:0',
-            'collection_date' => 'required|date',
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $order = Order::findOrFail($validated['order_id']);
+        $shipment = \App\Models\Shipment::findOrFail($validated['shipment_id']);
+
+        // Check if this shipment already has a collection
+        if ($shipment->hasCollection()) {
+            return redirect()->back()
+                ->withErrors(['shipment_id' => 'هذه الشحنة تحتوي على تحصيل بالفعل.'])
+                ->withInput();
+        }
 
         $collection = new Collection();
-        $collection->order_id = $validated['order_id'];
+        $collection->shipment_id = $validated['shipment_id'];
         $collection->amount = $validated['amount'];
-        $collection->collection_date = Carbon::parse($validated['collection_date']);
         $collection->notes = $validated['notes'];
         $collection->status = 'pending';
         $collection->save();
@@ -108,7 +119,7 @@ class CollectionController extends Controller
      */
     public function show(Collection $collection)
     {
-        $collection->load(['order', 'order.customer', 'order.items.product']);
+        $collection->load(['shipment.order.customer', 'shipment.order.items.product', 'collector']);
 
         return view('admin.collections.show', compact('collection'));
     }
@@ -118,7 +129,7 @@ class CollectionController extends Controller
      */
     public function edit(Collection $collection)
     {
-        $collection->load(['order', 'order.customer']);
+        $collection->load(['shipment.order.customer', 'collector']);
 
         return view('admin.collections.edit', compact('collection'));
     }
@@ -130,12 +141,10 @@ class CollectionController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0',
-            'collection_date' => 'required|date',
             'notes' => 'nullable|string|max:500',
         ]);
 
         $collection->amount = $validated['amount'];
-        $collection->collection_date = Carbon::parse($validated['collection_date']);
         $collection->notes = $validated['notes'];
         $collection->save();
 
@@ -160,13 +169,15 @@ class CollectionController extends Controller
     public function markCollected(Request $request, Collection $collection)
     {
         $validated = $request->validate([
-            'collected_by' => 'required|string|max:255',
-            'collection_notes' => 'nullable|string|max:500',
+            'collected_by' => 'required|exists:users,id',
+            'notes' => 'nullable|string|max:500',
+            'receipt_number' => 'nullable|string|max:255',
         ]);
 
         $collection->status = 'collected';
         $collection->collected_by = $validated['collected_by'];
-        $collection->collection_notes = $validated['collection_notes'];
+        $collection->notes = $validated['notes'];
+        $collection->receipt_number = $validated['receipt_number'] ?? null;
         $collection->collected_at = now();
         $collection->save();
 
@@ -180,13 +191,11 @@ class CollectionController extends Controller
     public function markSettled(Request $request, Collection $collection)
     {
         $validated = $request->validate([
-            'settlement_reference' => 'required|string|max:255',
-            'settlement_notes' => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:500',
         ]);
 
         $collection->status = 'settled';
-        $collection->settlement_reference = $validated['settlement_reference'];
-        $collection->settlement_notes = $validated['settlement_notes'];
+        $collection->notes = $validated['notes'];
         $collection->settled_at = now();
         $collection->save();
 
