@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\ProductStock;
 use App\Models\Order;
+use App\Models\PurchaseOrder;
 use Carbon\Carbon;
 use App\Models\Country;
 
@@ -260,9 +261,9 @@ class ReportController extends Controller
     $totalCollections = $query->sum('total_amount');
 
     // تحميل الطلبات مع بيانات التصفية
-    $orders = $query->orderBy('created_at', 'desc')->paginate(20);
+    $collections = $query->orderBy('created_at', 'desc')->paginate(20);
 
-    return view('reports.collections.index', compact('orders', 'totalCollections'));
+    return view('admin.reports.collections', compact('collections', 'totalCollections'));
 }
     
     /**
@@ -270,6 +271,28 @@ class ReportController extends Controller
      */
     public function purchases(Request $request)
     {
-        return view('admin.reports.purchases');
+        $query = PurchaseOrder::query();
+
+        // فلترة حسب نطاق التاريخ
+        if ($request->filled('date_range')) {
+            $this->applyDateRangeFilter($query, $request->input('date_range'));
+        }
+
+        // فلترة حسب تواريخ بداية ونهاية مخصصة
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
+        }
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
+        }
+
+        // فلترة حسب الحالة
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $purchaseOrders = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('admin.reports.purchases', compact('purchaseOrders'));
     }
 }
