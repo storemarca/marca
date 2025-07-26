@@ -47,15 +47,8 @@ class CollectionController extends Controller
         $collectedAmount = Collection::where('status', 'collected')->sum('amount');
         $pendingAmount = Collection::where('status', 'pending')->sum('amount');
 
-        // الحصول على الطلبات للعرض في الصفحة
-        $orders = collect();
-        if ($collections->isNotEmpty()) {
-            $orders = $collections->pluck('order')->filter();
-        }
-
         return view('admin.collections.index', compact(
             'collections',
-            'orders',
             'totalCollections',
             'pendingCollections',
             'collectedAmount',

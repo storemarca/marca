@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
+use App\Models\Order;
+
 class Collection extends Model
 {
     use HasFactory;
@@ -17,6 +19,7 @@ class Collection extends Model
      */
     protected $fillable = [
         'shipment_id',
+        'order_id',
         'amount',
         'status',
         'collected_by',
@@ -94,10 +97,10 @@ class Collection extends Model
     }
     
     /**
-     * Get the order associated with this collection through the shipment.
+     * Get the order associated with this collection.
      */
     public function order()
     {
-        return $this->shipment->order;
+        return $this->belongsTo(Order::class);
     }
 }

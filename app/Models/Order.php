@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use App\Models\User;
+use App\Models\Collection;
 
 class Order extends Model
 {
@@ -564,6 +565,14 @@ public function scopeGuestOrders($query)
     public function affiliateLinkStat()
     {
         return $this->hasOne(AffiliateLinkStat::class);
+    }
+
+    /**
+     * Get the collections for this order.
+     */
+    public function collections()
+    {
+        return $this->hasMany(Collection::class);
     }
 
     // === عمليات لوجيك ===
