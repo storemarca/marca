@@ -78,10 +78,10 @@ class CountryController extends Controller
         $customersCount = $country->customers()->count();
         
         // عدد العناوين في هذا البلد
-        $addressesCount = $country->addresses()->count();
+        $addressesCount = $country->addresses()->count ();
         
         // عدد الطلبات من هذا البلد
-        $ordersCount = $country->orders()->count();
+        $ordersCount = $country->orders()->count() ?? 0;
         
         // عدد المستودعات في هذا البلد
         $warehousesCount = $country->warehouses()->count();
