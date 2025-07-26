@@ -19,15 +19,26 @@ class AccountController extends Controller
     {
         $user = auth()->user();
         
-        // إحصائيات للمستخدم
-        $ordersCount = Order::where('customer_id', $user->id)->count();
-        $addressesCount = Address::where('customer_id', $user->id)->count();
+        if (!$user) {
+            return redirect()->route('login');
+        }
         
-        // آخر الطلبات
-        $recentOrders = Order::where('customer_id', $user->id)
-                            ->orderBy('created_at', 'desc')
-                            ->take(5)
-                            ->get();
+        // إحصائيات للمستخدم
+        try {
+            $ordersCount = Order::where('customer_id', $user->id)->count();
+            $addressesCount = Address::where('customer_id', $user->id)->count();
+            
+            // آخر الطلبات
+            $recentOrders = Order::where('customer_id', $user->id)
+                                ->orderBy('created_at', 'desc')
+                                ->take(5)
+                                ->get();
+        } catch (\Exception $e) {
+            // Fallback values in case of database errors
+            $ordersCount = 0;
+            $addressesCount = 0;
+            $recentOrders = collect();
+        }
         
         return view('user.account.index', compact('user', 'ordersCount', 'addressesCount', 'recentOrders'));
     }

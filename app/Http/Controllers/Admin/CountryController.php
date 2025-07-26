@@ -74,17 +74,25 @@ class CountryController extends Controller
      */
     public function show(Country $country)
     {
-        // عدد العملاء من هذا البلد
-        $customersCount = $country->customers()->count();
-        
-        // عدد العناوين في هذا البلد
-        $addressesCount = $country->addresses()->count();
-        
-        // عدد الطلبات من هذا البلد
-        $ordersCount = $country->orders()->count();
-        
-        // عدد المستودعات في هذا البلد
-        $warehousesCount = $country->warehouses()->count();
+        try {
+            // عدد العملاء من هذا البلد
+            $customersCount = $country->customers()->count();
+            
+            // عدد العناوين في هذا البلد
+            $addressesCount = $country->addresses()->count();
+            
+            // عدد الطلبات من هذا البلد
+            $ordersCount = $country->orders()->count();
+            
+            // عدد المستودعات في هذا البلد
+            $warehousesCount = $country->warehouses()->count();
+        } catch (\Exception $e) {
+            // Fallback values in case of database errors
+            $customersCount = 0;
+            $addressesCount = 0;
+            $ordersCount = 0;
+            $warehousesCount = 0;
+        }
         
         return view('admin.countries.show', compact(
             'country',
