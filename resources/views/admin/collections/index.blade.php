@@ -59,13 +59,13 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title">عدد الطلبات</h5>
-                    <p class="h4">{{ $orders->total() }}</p>
+                    <p class="h4">{{ $ordersCount }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    @if($orders->isEmpty())
+    @if($collections->isEmpty())
         <div class="alert alert-info text-center">
             لا توجد بيانات مطابقة للفلاتر المحددة.
         </div>
