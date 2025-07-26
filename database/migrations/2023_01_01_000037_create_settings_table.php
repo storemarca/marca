@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('group')->comment('مجموعة الإعدادات');
             $table->text('value')->nullable()->comment('القيمة (nullable)');
             $table->string('type')->default('string')->comment('نوع البيانات');
-
+            $table->string('description')->nullable()->comment('وصف الإعداد (اختياري)');
+            $table->timestamps();
             $table->index('key', 'idx_settings_key');
             $table->index('group', 'idx_settings_group');
             $table->unique(['key', 'group'], 'uniq_key_group');

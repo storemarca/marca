@@ -14,21 +14,34 @@ class Setting extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'key',
         'value',
-        'group'
+        'group',
+        'type',
+        'description',
     ];
 
     /**
-     * Get a setting by key
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'value' => 'json',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Get a setting value by key, with cache.
      *
      * @param string $key
      * @param mixed $default
@@ -36,41 +49,118 @@ class Setting extends Model
      */
     public static function get(string $key, $default = null)
     {
-        $setting = self::where('key', $key)->first();
-        
-        if ($setting) {
-            return $setting->value;
-        }
-        
-        return $default;
+        $cacheKey = "setting_{$key}";
+
+        return cache()->remember($cacheKey, 3600, function () use ($key, $default) {
+            $setting = static::where('key', $key)->first();
+
+            if (!$setting) {
+                return $default;
+            }
+
+            return static::castValue($setting->value, $setting->type ?? 'string');
+        });
     }
 
     /**
-     * Set a setting value
+     * Set or update a setting.
      *
      * @param string $key
      * @param mixed $value
      * @param string $group
-     * @return Setting
+     * @param string $type
+     * @return static
      */
-    public static function set(string $key, $value, string $group = 'general')
+    public static function set(string $key, $value, string $group = 'general', string $type = 'string')
     {
-        $setting = self::firstOrNew(['key' => $key]);
-        $setting->value = $value;
-        $setting->group = $group;
-        $setting->save();
-        
+        $setting = static::updateOrCreate(
+            ['key' => $key],
+            [
+                'value' => static::prepareValue($value, $type),
+                'group' => $group,
+                'type' => $type,
+            ]
+        );
+
+        // Clear related cache
+        cache()->forget("setting_{$key}");
+        cache()->forget("settings_group_{$group}");
+
         return $setting;
     }
 
     /**
-     * Get all settings by group
+     * Get all settings for a group, with cache.
      *
      * @param string $group
      * @return \Illuminate\Support\Collection
      */
     public static function getGroup(string $group)
     {
-        return self::where('group', $group)->get()->pluck('value', 'key');
+        $cacheKey = "settings_group_{$group}";
+
+        return cache()->remember($cacheKey, 3600, function () use ($group) {
+            return static::where('group', $group)->get()->mapWithKeys(function ($setting) {
+                return [
+                    $setting->key => static::castValue($setting->value, $setting->type ?? 'string'),
+                ];
+            });
+        });
     }
-} 
+
+    /**
+     * Cast the stored value to its proper type.
+     *
+     * @param mixed $value
+     * @param string $type
+     * @return mixed
+     */
+    protected static function castValue($value, $type)
+    {
+        switch ($type) {
+            case 'boolean':
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            case 'integer':
+                return (int) $value;
+            case 'float':
+                return (float) $value;
+            case 'json':
+            case 'array':
+                return is_string($value) ? json_decode($value, true) : $value;
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Prepare the value to be stored in DB.
+     *
+     * @param mixed $value
+     * @param string $type
+     * @return string
+     */
+    protected static function prepareValue($value, $type)
+    {
+        switch ($type) {
+            case 'boolean':
+                return $value ? '1' : '0';
+            case 'json':
+            case 'array':
+                return json_encode($value);
+            default:
+                return (string) $value;
+        }
+    }
+
+    /**
+     * Scope to filter settings by group.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $group
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeGroup($query, $group)
+    {
+        return $query->where('group', $group);
+    }
+}

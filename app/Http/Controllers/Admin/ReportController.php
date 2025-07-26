@@ -10,6 +10,8 @@ use App\Models\Warehouse;
 use App\Models\ProductStock;
 use App\Models\Order;
 use Carbon\Carbon;
+use App\Models\Country;
+
 
 class ReportController extends Controller
 {
@@ -127,52 +129,72 @@ class ReportController extends Controller
      * عرض تقرير المبيعات
      */
     public function sales(Request $request)
-    {
-        $query = Order::with(['customer', 'items.product']);
+{
+    $query = Order::with(['customer', 'items.product']);
 
-        // فلترة حسب نطاق التواريخ
-        if ($request->filled('date_range')) {
-            $this->applyDateRangeFilter($query, $request->input('date_range'));
-        }
-
-        // فلترة حسب تواريخ بداية ونهاية مخصصة
-        if ($request->filled('start_date')) {
-            $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
-        }
-        if ($request->filled('end_date')) {
-            $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
-        }
-
-        // فلترة حسب حالة الطلب
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // فلترة حسب طريقة الدفع
-        if ($request->filled('payment_method')) {
-            $query->where('payment_method', $request->payment_method);
-        }
-
-        $orders = $query->orderBy('created_at', 'desc')->paginate(20);
-        
-        // إحصائيات
-        $totalSales = Order::where('status', '!=', 'cancelled')->sum('total_amount');
-        $totalOrders = Order::where('status', '!=', 'cancelled')->count();
-        $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
-        
-        // إحصائيات إضافية
-        $salesByMonth = $this->getSalesByMonth();
-        $topProducts = $this->getTopSellingProducts();
-        
-        return view('admin.reports.sales', compact(
-            'orders',
-            'totalSales',
-            'totalOrders',
-            'averageOrderValue',
-            'salesByMonth',
-            'topProducts'
-        ));
+    // فلترة حسب نطاق التواريخ
+    if ($request->filled('date_range')) {
+        $this->applyDateRangeFilter($query, $request->input('date_range'));
     }
+
+    // فلترة حسب تواريخ بداية ونهاية مخصصة
+    if ($request->filled('start_date')) {
+        $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
+    }
+    if ($request->filled('end_date')) {
+        $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
+    }
+
+    // فلترة حسب حالة الطلب
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // فلترة حسب طريقة الدفع
+    if ($request->filled('payment_method')) {
+        $query->where('payment_method', $request->payment_method);
+    }
+
+    $orders = $query->orderBy('created_at', 'desc')->paginate(20);
+    
+    // إحصائيات
+    $totalSales = Order::where('status', '!=', 'cancelled')->sum('total_amount');
+    $totalOrders = Order::where('status', '!=', 'cancelled')->count();
+    $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+    
+    // إحصائيات إضافية
+    $salesByMonth = $this->getSalesByMonth();
+    $topProducts = $this->getTopSellingProducts();
+
+    // ✅ إضافة التاريخ الافتراضي
+    $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+    $endDate = Carbon::now()->endOfMonth();
+    $countries = Country::orderBy('name')->get();
+    $salesByDate = Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
+    ->where('status', '!=', 'cancelled')
+    ->groupBy('date')
+    ->orderBy('date', 'desc')
+    ->get();    
+    $salesByCountry = Order::select('shipping_country', \DB::raw('SUM(total_amount) as total_sales'))
+    ->where('status', '!=', 'cancelled')
+    ->groupBy('shipping_country')
+    ->orderByDesc('total_sales')
+    ->get();
+    
+    return view('admin.reports.sales', compact(
+        'orders',
+        'totalSales',
+        'totalOrders',
+        'averageOrderValue',
+        'salesByMonth',
+        'topProducts',
+        'startDate',
+        'endDate',
+        'countries',
+        'salesByDate',
+        'salesByCountry'
+    ));
+}
     
     /**
      * الحصول على المبيعات حسب الشهر
@@ -213,9 +235,35 @@ class ReportController extends Controller
      * عرض تقرير التحصيلات
      */
     public function collections(Request $request)
-    {
-        return view('admin.reports.collections');
+{
+    $query = Order::with('customer')->where('status', '!=', 'cancelled');
+
+    // فلترة حسب نطاق التاريخ الجاهز
+    if ($request->filled('date_range')) {
+        $this->applyDateRangeFilter($query, $request->input('date_range'));
     }
+
+    // فلترة حسب تواريخ بداية ونهاية مخصصة
+    if ($request->filled('start_date')) {
+        $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
+    }
+    if ($request->filled('end_date')) {
+        $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
+    }
+
+    // فلترة حسب طريقة الدفع
+    if ($request->filled('payment_method')) {
+        $query->where('payment_method', $request->payment_method);
+    }
+
+    // التحصيلات
+    $totalCollections = $query->sum('total_amount');
+
+    // تحميل الطلبات مع بيانات التصفية
+    $orders = $query->orderBy('created_at', 'desc')->paginate(20);
+
+    return view('reports.collections.index', compact('orders', 'totalCollections'));
+}
     
     /**
      * عرض تقرير المشتريات
