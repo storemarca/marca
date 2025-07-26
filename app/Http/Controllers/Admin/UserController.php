@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Order;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -52,8 +53,10 @@ class UserController extends Controller
         
         $users = $query->with('roles')->paginate(15);
         $roles = Role::all();
+
         
-        return view('admin.users.index', compact('users', 'roles'));
+        
+        return view('admin.users.index', compact('users', 'roles', 'orders'));
     }
 
     /**
@@ -112,8 +115,15 @@ class UserController extends Controller
         
         // الحصول على صلاحيات المستخدم
         $permissions = $user->getAllPermissions()->pluck('name');
-        
-        return view('admin.users.show', compact('user', 'permissions'));
+        $orders = collect();
+        if ($user->hasRole('customer')) {
+            $orders = Order::where('customer_id', $user->id)
+            ->with(['items.product'])
+            ->latest()
+            ->take(10)
+            ->get();
+        }
+        return view('admin.users.show', compact('user', 'permissions', 'orders'));
     }
 
     /**

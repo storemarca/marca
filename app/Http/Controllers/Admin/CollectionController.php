@@ -47,9 +47,16 @@ class CollectionController extends Controller
         $collectedAmount = Collection::where('status', 'collected')->sum('amount');
         $pendingAmount = Collection::where('status', 'pending')->sum('amount');
 
+
+        $orders = collect();
+        if ($collections->isNotEmpty()) {
+            $orders = $collections->pluck('order_id')->unique();
+        }
+
         return view('admin.collections.index', compact(
             'collections',
             'totalCollections',
+            'orders',
             'pendingCollections',
             'collectedAmount',
             'pendingAmount'
