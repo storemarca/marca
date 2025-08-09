@@ -708,12 +708,15 @@ class SearchService
     }
     
     /**
-     * تنظيف استعلام البحث من الأحرف الخاصة
+     * تنظيف نص البحث
+     *
+     * @param string $query نص البحث
+     * @return string نص البحث المنظف
      */
     protected function cleanSearchQuery(string $query): string
     {
         // إزالة الأحرف الخاصة والرموز غير المرغوب فيها
-        $query = preg_replace('/[\\\/%^\[\]{}|@~#$&*()=+\'":;,<>?]/', ' ', $query);
+        $query = preg_replace('/[\\\/%^\[\]{}|@~#$&*()=+\\'":;,<>?]/', ' ', $query);
         
         // إزالة المسافات الزائدة
         $query = preg_replace('/\s+/', ' ', $query);

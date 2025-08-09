@@ -20,6 +20,8 @@ class ProductPrice extends Model
         'country_id',
         'price',
         'sale_price',
+        'sale_price_start_date',
+        'sale_price_end_date',
         'cost',
         'is_active',
     ];
@@ -34,6 +36,8 @@ class ProductPrice extends Model
         'sale_price' => 'decimal:2',
         'cost' => 'decimal:2',
         'is_active' => 'boolean',
+        'sale_price_start_date' => 'datetime',
+        'sale_price_end_date' => 'datetime',
     ];
 
     /**

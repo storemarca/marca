@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="refresh" content="3600">
 
     <title>{{ html_safe(__('admin.admin_panel')) }} - {{ config('app.name', 'Marca') }} - @yield('title', html_safe(__('admin.dashboard')))</title>
 
@@ -30,7 +31,7 @@
     @endif
     
     <!-- Custom CSS -->
-    @if(isset($settings['custom_css']) && !empty($settings['custom_css']))
+    @if(!empty($settings['custom_css']))
     <style>
         {!! $settings['custom_css'] !!}
     </style>

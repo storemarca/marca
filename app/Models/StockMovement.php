@@ -25,6 +25,7 @@ class StockMovement extends Model
         'order_id',
         'purchase_order_id',
         'user_id',
+        'is_active',  // Add this line
     ];
 
     /**
@@ -36,6 +37,7 @@ class StockMovement extends Model
         'old_quantity' => 'integer',
         'new_quantity' => 'integer',
         'quantity_change' => 'integer',
+        'is_active' => 'boolean',  // Add this line
     ];
 
     /**
@@ -137,4 +139,50 @@ class StockMovement extends Model
     {
         return $query->where('purchase_order_id', $purchaseOrderId);
     }
-} 
+    
+    /**
+     * Get the type attribute (alias for operation).
+     *
+     * @return string
+     */
+    public function getTypeAttribute()
+    {
+        return $this->operation;
+    }
+    
+    /**
+     * Get the quantity attribute (alias for quantity_change).
+     *
+     * @return int
+     */
+    public function getQuantityAttribute()
+    {
+        return $this->quantity_change;
+    }
+    
+    /**
+     * Get the balance_after attribute (alias for new_quantity).
+     * 
+     * @return int
+     */
+    public function getBalanceAfterAttribute()
+    {
+        return $this->new_quantity;
+    }
+    
+    /**
+     * Get the reference_type attribute based on which reference ID is set.
+     * 
+     * @return string|null
+     */
+    public function getReferenceTypeAttribute()
+    {
+        if ($this->order_id) {
+            return 'order';
+        } elseif ($this->purchase_order_id) {
+            return 'purchase_order';
+        } else {
+            return 'manual';
+        }
+    }
+}

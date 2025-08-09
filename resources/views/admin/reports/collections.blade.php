@@ -1,198 +1,147 @@
 @extends('layouts.admin')
 
-@section('title', 'تقرير التحصيلات')
-@section('header', 'تقرير التحصيلات')
+@section('title', __('collections.title'))
 
 @section('content')
-    <!-- إحصائيات سريعة -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-green-500 transition-transform duration-300 transform hover:scale-105">
-            <div class="flex items-center">
-                <div class="bg-green-100 text-green-600 p-3 rounded-full">
-                    <i class="fas fa-money-bill-wave text-xl"></i>
-                </div>
-                <div class="mr-4">
-                    <h2 class="text-gray-600 text-sm">إجمالي التحصيلات</h2>
-                    <p class="text-2xl font-bold">{{ number_format($totalCollections, 2) }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-yellow-500 transition-transform duration-300 transform hover:scale-105">
-            <div class="flex items-center">
-                <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full">
-                    <i class="fas fa-clock text-xl"></i>
-                </div>
-                <div class="mr-4">
-                    <h2 class="text-gray-600 text-sm">تحصيلات قيد الانتظار</h2>
-                    <p class="text-2xl font-bold">{{ number_format($pendingCollections, 2) }}</p>
+<div class="container">
+    <h1 class="mb-4">{{ __('collections.title') }}</h1>
+
+    {{-- الإحصائيات --}}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>{{ __('collections.total_collections') }}</h5>
+                    <p>{{ $totalCollections }}</p>
                 </div>
             </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-6 border-r-4 border-blue-500 transition-transform duration-300 transform hover:scale-105">
-            <div class="flex items-center">
-                <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
-                    <i class="fas fa-check-circle text-xl"></i>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>{{ __('collections.pending_collections') }}</h5>
+                    <p>{{ $pendingCollections }}</p>
                 </div>
-                <div class="mr-4">
-                    <h2 class="text-gray-600 text-sm">تحصيلات مسددة</h2>
-                    <p class="text-2xl font-bold">{{ number_format($settledCollections, 2) }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>{{ __('collections.collected_amount') }}</h5>
+                    <p>{{ number_format($collectedAmount, 2) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>{{ __('collections.pending_amount') }}</h5>
+                    <p>{{ number_format($pendingAmount, 2) }}</p>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- فلاتر البحث -->
-    <div class="mb-6">
-        <form action="{{ route('admin.reports.collections') }}" method="GET" class="bg-white rounded-lg shadow-md p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-filter text-gray-400"></i>
-                        </div>
-                        <select name="status" id="status" class="w-full pr-10 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">جميع الحالات</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
-                            <option value="settled" {{ request('status') == 'settled' ? 'selected' : '' }}>مسددة</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">من تاريخ</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-calendar text-gray-400"></i>
-                        </div>
-                        <input type="date" name="date_from" id="date_from" class="w-full pr-10 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" value="{{ request('date_from') }}">
-                    </div>
-                </div>
-                
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">إلى تاريخ</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-calendar text-gray-400"></i>
-                        </div>
-                        <input type="date" name="date_to" id="date_to" class="w-full pr-10 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" value="{{ request('date_to') }}">
-                    </div>
-                </div>
-                
-                <div class="flex items-end">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ml-2 transition-colors duration-300">
-                        <i class="fas fa-search ml-1"></i> تصفية
-                    </button>
-                    <a href="{{ route('admin.reports.collections') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300">
-                        <i class="fas fa-times ml-1"></i> إعادة تعيين
-                    </a>
-                </div>
-            </div>
-        </form>
-    </div>
-    
-    <!-- جدول التحصيلات -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">قائمة التحصيلات</h3>
-            <div class="mt-2 md:mt-0 text-sm text-gray-500">
-                عدد التحصيلات: <span class="font-semibold">{{ $collections->total() }}</span>
-            </div>
+
+    {{-- الفلاتر --}}
+    <form method="GET" class="mb-4 row g-3">
+        <div class="col-md-2">
+            <select name="status" class="form-control">
+                <option value="">{{ __('collections.all_statuses') }}</option>
+                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>
+                    {{ __('collections.status_pending') }}
+                </option>
+                <option value="collected" {{ request('status') === 'collected' ? 'selected' : '' }}>
+                    {{ __('collections.status_collected') }}
+                </option>
+                <option value="settled" {{ request('status') === 'settled' ? 'selected' : '' }}>
+                    {{ __('collections.status_settled') }}
+                </option>
+            </select>
         </div>
-        
-        @if($collections->isEmpty())
-            <div class="p-8 text-center">
-                <div class="inline-flex rounded-full bg-yellow-100 p-4 mb-4">
-                    <div class="rounded-full bg-yellow-200 p-4">
-                        <i class="fas fa-money-bill text-yellow-600 text-3xl"></i>
-                    </div>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-1">لا توجد بيانات متاحة</h3>
-                <p class="text-gray-500 mb-4">لم يتم العثور على أي تحصيلات تطابق معايير البحث</p>
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                رقم التحصيل
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                رقم الشحنة
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                شركة الشحن
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                المبلغ
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                التاريخ
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                الحالة
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                الإجراءات
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach ($collections as $collection)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">#{{ $collection->id }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">#{{ $collection->shipment->tracking_number }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $collection->shipment->shippingCompany->name ?? 'غير متوفر' }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ number_format($collection->amount, 2) }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $collection->created_at->format('Y-m-d') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $collection->created_at->format('h:i A') }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($collection->status == 'pending')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span> قيد الانتظار
-                                        </span>
-                                    @elseif($collection->status == 'settled')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span> مسددة
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                    <a href="{{ route('admin.shipments.show', $collection->shipment_id) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 p-1.5 rounded-full hover:bg-blue-100 transition-colors duration-200" title="عرض الشحنة">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    @if($collection->status == 'pending')
-                                        <form action="{{ route('admin.collections.settle', $collection->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="text-green-600 hover:text-green-900 bg-green-50 p-1.5 rounded-full hover:bg-green-100 transition-colors duration-200" title="تسديد التحصيل">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="px-6 py-4">
-                {{ $collections->links() }}
-            </div>
-        @endif
+        <div class="col-md-2">
+            <select name="date_range" class="form-control">
+                <option value="">{{ __('collections.all_dates') }}</option>
+                <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>{{ __('collections.today') }}</option>
+                <option value="yesterday" {{ request('date_range') === 'yesterday' ? 'selected' : '' }}>{{ __('collections.yesterday') }}</option>
+                <option value="this_week" {{ request('date_range') === 'this_week' ? 'selected' : '' }}>{{ __('collections.this_week') }}</option>
+                <option value="last_week" {{ request('date_range') === 'last_week' ? 'selected' : '' }}>{{ __('collections.last_week') }}</option>
+                <option value="this_month" {{ request('date_range') === 'this_month' ? 'selected' : '' }}>{{ __('collections.this_month') }}</option>
+                <option value="last_month" {{ request('date_range') === 'last_month' ? 'selected' : '' }}>{{ __('collections.last_month') }}</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">{{ __('collections.filter') }}</button>
+        </div>
+    </form>
+
+    {{-- جدول التحصيلات --}}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>{{ __('collections.id') }}</th>
+                    <th>{{ __('collections.amount') }}</th>
+                    <th>{{ __('collections.status') }}</th>
+                    <th>{{ __('collections.customer') }}</th>
+                    <th>{{ __('collections.collector') }}</th>
+                    <th>{{ __('collections.created_at') }}</th>
+                    <th>{{ __('collections.actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($collections as $collection)
+                    <tr>
+                        <td>#{{ $collection->id }}</td>
+                        <td>{{ number_format($collection->amount, 2) }}</td>
+                        <td>{{ __('collections.status_' . $collection->status) }}</td>
+                        <td>
+                            {{ optional($collection->shipment->order->customer)->name }}
+                        </td>
+                        <td>{{ optional($collection->collector)->name ?? '-' }}</td>
+                        <td>{{ $collection->created_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                            <a href="{{ route('admin.collections.show', $collection) }}" class="btn btn-sm btn-info">
+                                {{ __('collections.view') }}
+                            </a>
+                            <a href="{{ route('admin.collections.edit', $collection) }}" class="btn btn-sm btn-warning">
+                                {{ __('collections.edit') }}
+                            </a>
+                            @if($collection->status === 'pending')
+                                <form action="{{ route('admin.collections.markCollected', $collection) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('{{ __('collections.confirm_collect') }}')">
+                                        {{ __('collections.mark_collected') }}
+                                    </button>
+                                </form>
+                            @endif
+                            @if($collection->status === 'collected')
+                                <form action="{{ route('admin.collections.markSettled', $collection) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-dark" onclick="return confirm('{{ __('collections.confirm_settle') }}')">
+                                        {{ __('collections.mark_settled') }}
+                                    </button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7">{{ __('collections.no_collections_found') }}</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-@endsection 
+
+    {{-- روابط الصفحات --}}
+    <div class="mt-4">
+        {{ $collections->withQueryString()->links() }}
+    </div>
+</div>
+@endsection

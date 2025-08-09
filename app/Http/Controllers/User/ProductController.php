@@ -139,14 +139,8 @@ class ProductController extends Controller
         // Consulta base de productos
         $query = Product::query();
         
-        // Filtrar solo productos activos
-        $query->where('is_active', true);
-        
-        // Filtrar productos por país actual
-        $query->whereHas('prices', function($q) use ($country) {
-            $q->where('country_id', $country->id)
-              ->where('is_active', true);
-        });
+        // Filtrar productos activos con precios para el país actual
+        $query->visibleInCountry($country->id);
         
         // Cargar los precios específicos para el país actual
         $query->with(['prices' => function($q) use ($country) {
@@ -256,7 +250,11 @@ class ProductController extends Controller
      */
     public function review(Request $request, $id)
     {
+        foreach ($request->input('is_active') as $countryId => $isActive) {
+    $request->merge(['is_active.' . $countryId => (bool) $isActive]);
+}
         $request->validate([
+            'is_active' => 'required|boolean',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:500',
         ]);

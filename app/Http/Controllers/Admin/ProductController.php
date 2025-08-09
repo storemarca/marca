@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -238,6 +239,9 @@ class ProductController extends Controller
                 if (isset($validated['price'])) {
                     unset($validated['price']);
                 }
+                if (isset($validated['sale_price'])) {
+                    unset($validated['sale_price']);
+                }
                 if (isset($validated['stocks'])) {
                     unset($validated['stocks']);
                 }
@@ -305,7 +309,7 @@ class ProductController extends Controller
                                 'quantity_change' => $stock['quantity'],
                                 'operation' => 'add',
                                 'reason' => 'إضافة منتج جديد',
-                                'user_id' => auth()->id(),
+                                'user_id' => Auth::check() ? Auth::user()->getKey() : 1, // 1 = system user
                             ]);
                         }
                     }
@@ -408,7 +412,7 @@ class ProductController extends Controller
             'height' => 'nullable|numeric|min:0',
             'length' => 'nullable|numeric|min:0',
             'pieces_count' => 'nullable|integer|min:1',
-            'is_active' => 'boolean',
+            'is_active.*' => 'boolean',
             'is_featured' => 'boolean',
             'images.*' => 'nullable|image|max:2048',
             'video_url' => 'nullable|url',
@@ -490,7 +494,10 @@ class ProductController extends Controller
         $validated['images'] = $images;
         
         // تعيين قيمة افتراضية لـ is_active و is_featured
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->input('is_active', []);
+        foreach ($request->countries as $country) {
+            $validated['is_active'][$country->id] = isset($validated['is_active'][$country->id]) ? 1 : 0;
+        }
         $validated['is_featured'] = $request->has('is_featured') ? true : false;
         
         // معالجة الألوان
@@ -523,6 +530,20 @@ class ProductController extends Controller
         
         // معالجة المقاسات
         $sizes = [];
+
+        // معالجة الفيديوهات
+        $videos = [];
+        if ($request->has('videos')) {
+            foreach ($request->videos as $video) {
+                if (!empty($video['title']) && !empty($video['url'])) {
+                    $videos[] = [
+                        'title' => $video['title'],
+                        'url' => $video['url']
+                    ];
+                }
+            }
+        }
+        $validated['videos'] = $videos;
         
         // معالجة المقاسات الشائعة المحددة
         if ($request->has('common_sizes')) {
@@ -728,7 +749,7 @@ class ProductController extends Controller
                             'quantity_change' => $difference,
                             'operation' => $difference > 0 ? 'add' : 'subtract',
                             'reason' => 'تعديل يدوي للمخزون',
-                            'user_id' => auth()->id(),
+                            'user_id' => Auth::check() ? Auth::user()->getKey() : 1, // 1 = system user
                         ]);
                     }
                 } else {
@@ -749,7 +770,7 @@ class ProductController extends Controller
                         'quantity_change' => $quantity,
                         'operation' => 'add',
                         'reason' => 'إضافة مخزون جديد',
-                        'user_id' => auth()->id(),
+                        'user_id' => Auth::check() ? Auth::user()->getKey() : 1, // 1 = system user
                     ]);
                 }
             }
